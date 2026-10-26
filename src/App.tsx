@@ -1,3 +1,4 @@
+import { ErrorBoundary } from './components/WebGLGuard';
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { progress, useProgress } from './state/progress';
 import DerivativeExplorer from './modules/DerivativeExplorer';
@@ -32,7 +33,7 @@ export default function App() {
         <h1>∂ Calculus I Mastery Lab</h1>
         {modules.map((q) => <button key={q.id} className={q.id === id ? 'active' : ''} onClick={() => setId(q.id)}>{q.name}</button>)}
       </nav>
-      <main><Suspense fallback={<p>Loading 3D…</p>}>{Comp ? <Comp /> : <Home go={setId} />}</Suspense></main>
+      <main><ErrorBoundary key={id} fallback={<p role="alert">This module failed to load. Please refresh the page.</p>}><Suspense fallback={<p>Loading 3D…</p>}>{Comp ? <Comp /> : <Home go={setId} />}</Suspense></ErrorBoundary></main>
     </div>
   );
 }

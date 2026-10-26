@@ -8,6 +8,8 @@ import { Card, Slider, Badge } from '../components/ui';
 import { boxFixedVolume as BV, boxFixedSurface as BS } from '../math/optimization';
 import { fmt } from '../math/expr';
 import { COLORS } from './shared';
+import { hasWebGL, WebGLFallback, ErrorBoundary } from '../components/WebGLGuard';
+const WEBGL_OK = typeof document !== 'undefined' && hasWebGL();
 
 function Box3D({ x, h }: { x: number; h: number }) {
   const s = 3 / Math.max(x, h, 1e-6); // normalise so the bigger dimension is 3 units
@@ -56,12 +58,12 @@ export default function BoxOptimization() {
       <div className="grid2">
         <div>
           <div className="canvas3d" aria-label="3D box, drag to rotate, pinch/scroll to zoom">
-            <Canvas camera={{ position: [5, 4, 6], fov: 45 }}>
+            {WEBGL_OK ? <ErrorBoundary fallback={<WebGLFallback />}><Canvas camera={{ position: [5, 4, 6], fov: 45 }}>
               <ambientLight intensity={0.6} /><directionalLight position={[5, 8, 5]} intensity={1.1} />
               <Box3D x={x} h={h} />
               <gridHelper args={[10, 10, '#334155', '#1e293b']} position={[0, -1.6, 0]} />
               <OrbitControls enablePan={false} />
-            </Canvas>
+            </Canvas></ErrorBoundary> : <WebGLFallback />}
           </div>
           <p className="note">Drag/one-finger to rotate · pinch or scroll to zoom. The box is drawn to scale (largest dimension normalised).</p>
           <Card title="Live numbers">
